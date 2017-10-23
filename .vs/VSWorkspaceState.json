@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\testCloneOnLinux",
+    "\\testCloneOnLinux\\Data",
+    "\\testCloneOnLinux\\Models",
+    "\\testCloneOnLinux\\Views",
+    "\\testCloneOnLinux\\Views\\Home"
+  ],
+  "SelectedNode": "\\testCloneOnLinux\\Views\\Home\\Index.cshtml",
+  "PreviewInSolutionExplorer": false
+}
