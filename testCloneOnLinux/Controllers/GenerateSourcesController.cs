@@ -211,6 +211,19 @@ namespace testCloneOnLinux.Controllers
 
                        // client.RunCommand($"mkdir '{modelGen.Destination}' && cd '{modelGen.Source}' && cp * '{modelGen.Destination}'");
                         client.RunCommand($"mkdir '{modelGen.Destination}' && cp -a '{modelGen.Source + "/."}' '{modelGen.Destination}'");
+                        // client.RunCommand($"cd /home/gwebsite/public_html");
+                        //Fix permission cua tat ca folder ve 0755 va cac file ve 0644
+                        string chmodCommand = "find "+ "'/home/gwebsite/public_html/"+modelGen.Subdomain+ @"' -type d -exec chmod 0755 {} \;";
+                        client.RunCommand(chmodCommand);
+                        string chmodAllSubFolder = "find " + "'/home/gwebsite/public_html/" + modelGen.Subdomain +"/.'"+ @" -type d -exec chmod 0755 {} \;";
+                        client.RunCommand(chmodAllSubFolder);
+                        string chmodAllFile = "find " + "'/home/gwebsite/public_html/" + modelGen.Subdomain + "/.'" + @" -type f -exec chmod 0644 {} \;";
+                        client.RunCommand(chmodAllFile);
+                        //Fix permission chuyen owner cua tat ca cac file va folder source tu root -> gwebsite
+                        string chownFolder = "chown gwebsite:nobody " + "'/home/gwebsite/public_html/" + modelGen.Subdomain + "'";
+                        client.RunCommand(chownFolder);
+                        string chownAllContent = "chown -R gwebsite:nobody " + "'/home/gwebsite/public_html/" + modelGen.Subdomain + "'";
+                        client.RunCommand(chownAllContent);
                         /*------------*/
                         //Khoi tao ket noi vao MySqL
                         var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
@@ -289,6 +302,26 @@ namespace testCloneOnLinux.Controllers
                                 }
                             }
                         }
+                        string changeDBQuery = $"USE {modelGen.DatabaseName};";
+                        result = await mySqlConnector.ExecuteCommand(changeDBQuery);
+                        if(result.isSucceeded == false)
+                        {
+                            return result;
+                        }
+                        string siteURL = "http://" + modelGen.Subdomain + "." + modelGen.Domain;
+                        string updateSiteURLQuery = $"Update wp_options SET option_value = {siteURL} WHERE option_name = 'siteurl'";
+                        result = await mySqlConnector.ExecuteCommand(updateSiteURLQuery);
+                        if(result.isSucceeded == false)
+                        {
+                            return result;
+                        }
+                        string updateHomeQuery = $"Update wp_options SET option_value = {siteURL} WHERE option_name = 'home'";
+                        result = await mySqlConnector.ExecuteCommand(updateHomeQuery);
+                        if(result.isSucceeded == false)
+                        {
+                            return result;
+                            
+                        }
                         string useCWP = "USE root_cwp;";
                         result = await mySqlConnector.ExecuteCommand(useCWP);
                         if (result.isSucceeded == false)
@@ -364,6 +397,7 @@ namespace testCloneOnLinux.Controllers
                         //    con.Close();
 
                         //}
+                       // mySqlConnector.CloseConnection()
                         client.Disconnect();
                     }
                     else
