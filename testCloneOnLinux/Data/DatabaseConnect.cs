@@ -31,6 +31,7 @@ namespace testCloneOnLinux.Data
         public DatabaseConnect(string connectString)
         {
             this.connection = new MySqlConnection(connectString);
+            
         }
         //open connection to database
         public ObjectResult OpenConnection()
@@ -72,6 +73,7 @@ namespace testCloneOnLinux.Data
             try
             {
                 connection.Close();
+                
                 return true;
             }
             catch (MySqlException ex)
