@@ -32,5 +32,6 @@ namespace testCloneOnLinux.Models
         public string DATABASE_NAME { get; set; }
         public string DOMAIN { get; set; }
         public string SUB_DOMAIN { get; set; }
+        public string VIEW_ID { get; set; }
     }
 }
