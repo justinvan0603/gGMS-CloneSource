@@ -39,7 +39,7 @@ namespace testCloneOnLinux.Controllers
                         client.RunCommand($"mkdir '{toDestination}' && cd '{fromLocation}' && cp * '{toDestination}'");
                         /*------------*/
                         //Tao Mysql User va DB, gan user quan ly DB vua tao
-                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 3306, "127.0.0.1", 3306);
+                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
                         client.AddForwardedPort(portForwarded);
                         portForwarded.Start();
                         DatabaseConnect mySqlConnector = new DatabaseConnect("Server=127.0.0.1; Port=3306; Uid=root; Pwd=JOpaqGH7N7xz;");
@@ -228,7 +228,7 @@ namespace testCloneOnLinux.Controllers
                         client.RunCommand(chownAllContent);
                         /*------------*/
                         //Khoi tao ket noi vao MySqL
-                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 3306, "127.0.0.1", 3306);
+                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
                         client.AddForwardedPort(portForwarded);
                         portForwarded.Start();
 
@@ -414,128 +414,119 @@ namespace testCloneOnLinux.Controllers
                                         sftpClient.Disconnect();
                                     }
                                 }
-                            }
+                            }                     
+                        }
+                        ///Sua File VHost
+                        string vHostFileLocation = "/usr/local/apache/conf.d/vhosts.conf";
+                        SshCommand getvHostFile = client.CreateCommand($"cat '{vHostFileLocation}'");
+                        string vHostFile = getvHostFile.Execute();
 
-                            ///Sua File VHost
-                            string vHostFileLocation = "/usr/local/apache/conf.d/vhosts.conf";
-                            SshCommand getvHostFile = client.CreateCommand($"cat '{vHostFileLocation}'");
-                            string vHostFile = getvHostFile.Execute();
+                        string vHostContent = "";
+                        //vHostContent += Environment.NewLine;
+                        // vHostContent += $"# vhost_start {modelGen.Subdomain + "." + modelGen.Domain} ";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "<VirtualHost 103.7.41.51:8181> ";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += $"ServerName {modelGen.Subdomain + "." + modelGen.Domain} ";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += $"ServerAlias www.{modelGen.Subdomain + "." + modelGen.Domain}";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += $"ServerAdmin webmaster@{modelGen.Subdomain + "." + modelGen.Domain}";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += $"DocumentRoot /home/gwebsite/public_html/{modelGen.Subdomain}";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "UseCanonicalName Off";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += $"ScriptAlias /cgi-bin/ /home/gwebsite/public_html/{modelGen.Subdomain}/cgi-bin/";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += $"# Custom settings are loaded below this line (if any exist)";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "# Include " + '"' + $"/usr/local/apache/conf/userdata/gwebsite/{modelGen.Subdomain + "." + modelGen.Domain}/*.conf";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "<IfModule mod_userdir.c>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "UserDir disabled";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "UserDir enabled gwebsite";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "</IfModule>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "<IfModule mod_suexec.c>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "SuexecUserGroup gwebsite gwebsite";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "</IfModule>";
 
-                            string vHostContent="";
-                            //vHostContent += Environment.NewLine;
-                           // vHostContent += $"# vhost_start {modelGen.Subdomain + "." + modelGen.Domain} ";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "<VirtualHost 103.7.41.51:8181> ";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += $"ServerName {modelGen.Subdomain + "." + modelGen.Domain} ";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += $"ServerAlias www.{modelGen.Subdomain + "." + modelGen.Domain}";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += $"ServerAdmin webmaster@{modelGen.Subdomain + "." + modelGen.Domain}";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += $"DocumentRoot /home/gwebsite/public_html/{modelGen.Subdomain}";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "UseCanonicalName Off";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += $"ScriptAlias /cgi-bin/ /home/gwebsite/public_html/{modelGen.Subdomain}/cgi-bin/";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += $"# Custom settings are loaded below this line (if any exist)";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "# Include " + '"' + $"/usr/local/apache/conf/userdata/gwebsite/{modelGen.Subdomain + "." + modelGen.Domain}/*.conf";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "<IfModule mod_userdir.c>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "UserDir disabled";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "UserDir enabled gwebsite";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "</IfModule>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "<IfModule mod_suexec.c>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "SuexecUserGroup gwebsite gwebsite";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "</IfModule>";
-
-                            vHostContent += Environment.NewLine;
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "<IfModule mod_suphp.c>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "suPHP_UserGroup gwebsite gwebsite";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "suPHP_ConfigPath /home/gwebsite>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "</IfModule>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "<Directory " + '"' + $"/home/gwebsite/public_html/{modelGen.Subdomain}" + '"' + '>';
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "AllowOverride All";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "</Directory>";
-                            vHostContent += Environment.NewLine;
-                            vHostContent += Environment.NewLine;
-                            vHostContent += "</VirtualHost>";
-                            vHostContent += Environment.NewLine;
-                            //vHostContent += $"# vhost_end {modelGen.Subdomain + "." + modelGen.Domain}";
-                            //vHostFile += Environment.NewLine;
-                            vHostFile += vHostContent;
+                        vHostContent += Environment.NewLine;
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "<IfModule mod_suphp.c>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "suPHP_UserGroup gwebsite gwebsite";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "suPHP_ConfigPath /home/gwebsite>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "</IfModule>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "<Directory " + '"' + $"/home/gwebsite/public_html/{modelGen.Subdomain}" + '"' + '>';
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "AllowOverride All";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "</Directory>";
+                        vHostContent += Environment.NewLine;
+                        vHostContent += Environment.NewLine;
+                        vHostContent += "</VirtualHost>";
+                        vHostContent += Environment.NewLine;
+                        //vHostContent += $"# vhost_end {modelGen.Subdomain + "." + modelGen.Domain}";
+                        //vHostFile += Environment.NewLine;
+                        vHostFile += vHostContent;
 
 
 
-                            using (SftpClient sftpClient = new SftpClient("103.7.41.51", 22, "root", "Gsoft@235"))
+                        using (SftpClient sftpClient = new SftpClient("103.7.41.51", 22, "root", "Gsoft@235"))
+                        {
+                            sftpClient.ConnectionInfo.Timeout = TimeSpan.FromSeconds(1200);
+                            sftpClient.OperationTimeout = TimeSpan.FromSeconds(1200);
+                            sftpClient.Connect();
+                            if (sftpClient.IsConnected)
                             {
-                                sftpClient.ConnectionInfo.Timeout = TimeSpan.FromSeconds(1200);
-                                sftpClient.OperationTimeout = TimeSpan.FromSeconds(1200);
-                                sftpClient.Connect();
-                                if (sftpClient.IsConnected)
+                                try
                                 {
-                                    try
+                                    using (MemoryStream memStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(vHostFile)))
                                     {
-                                        using (MemoryStream memStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(vHostFile)))
-                                        {
 
-                                            try
-                                            {
-                                                sftpClient.UploadFile(memStream, vHostFileLocation, true);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Data.ObjectResult objRS = new Data.ObjectResult();
-                                                objRS.isSucceeded = false;
-                                                objRS.ErrorMessage = "Có lỗi xảy ra khi cập nhật lại file vHost của Apache";
-                                                return objRS;
-                                            }
+                                        try
+                                        {
+                                            sftpClient.UploadFile(memStream, vHostFileLocation, true);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Data.ObjectResult objRS = new Data.ObjectResult();
+                                            objRS.isSucceeded = false;
+                                            objRS.ErrorMessage = "Có lỗi xảy ra khi cập nhật lại file vHost của Apache";
+                                            return objRS;
                                         }
                                     }
-                                    catch (Exception ex)
-                                    {
-                                        Data.ObjectResult objRS = new Data.ObjectResult();
-                                        objRS.isSucceeded = false;
-                                        objRS.ErrorMessage = "Có lỗi xảy ra khi tạo file vHost - " + ex.Message;
-                                        return objRS;
-                                    }
-                                    finally
-                                    {
-                                        sftpClient.Disconnect();
-                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Data.ObjectResult objRS = new Data.ObjectResult();
+                                    objRS.isSucceeded = false;
+                                    objRS.ErrorMessage = "Có lỗi xảy ra khi tạo file vHost - " + ex.Message;
+                                    return objRS;
+                                }
+                                finally
+                                {
+                                    sftpClient.Disconnect();
                                 }
                             }
                         }
-                        ////Tao MYSQL DB va MYSQL USER -> grant full quyen cua user cho database
-                        //var portForwarded = new ForwardedPortLocal("127.0.0.1", 3306, "127.0.0.1", 3306);
-                        //client.AddForwardedPort(portForwarded);
-                        //portForwarded.Start();
-                        //using (MySqlConnection con = new MySqlConnection("Server=127.0.0.1; Port=3306; Uid=root; Pwd=JOpaqGH7N7xz;"))
-                        //{
-                        //    con.Open();
-                        //    MySqlCommand mySQLCmd = new MySqlCommand($"CREATE DATABASE IF NOT EXISTS {dbName}; CREATE USER '{mysqlUsername}'@'localhost' IDENTIFIED BY '{mysqlPassword}'; GRANT ALL PRIVILEGES ON  {dbName}. * TO '{mysqlUsername}'@'localhost';FLUSH PRIVILEGES;", con);
-                        //    int result = mySQLCmd.ExecuteNonQuery();
-                        //    con.Close();
+                        //Restart Apache de nhan Vhost moi
+                        string restartApacheCommand = "systemctl restart httpd.service";
+                        client.RunCommand(restartApacheCommand);
 
-                        //}
                         mySqlConnector.CloseConnection();
                         client.Disconnect();
                     }
@@ -565,6 +556,7 @@ namespace testCloneOnLinux.Controllers
                     client.Disconnect();
                 }
             }
+
 
         }
         //private bool CopySource(string fromLocation, string toDestination)

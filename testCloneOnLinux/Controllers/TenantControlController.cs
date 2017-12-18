@@ -53,7 +53,7 @@ namespace testCloneOnLinux.Controllers
                     client.Connect();
                     if (client.IsConnected)
                     {
-                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 3306, "127.0.0.1", 3306);
+                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
                         client.AddForwardedPort(portForwarded);
                         portForwarded.Start();
                         string mySQLConnectionString = "";
