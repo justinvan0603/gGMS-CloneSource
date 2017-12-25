@@ -29,7 +29,7 @@ namespace testCloneOnLinux.Controllers
                         foreach(var item in listModel)
                         {
                             string pluginDirectoryName = new DirectoryInfo(item.PrdPlugin.PluginLocation).Name;
-                            client.RunCommand("rm -rf home/gwebsite/public_html/" + item.PrjInstalledPlugin.SUBDOMAIN + "/wp-content/plugins/" + pluginDirectoryName);
+                            client.RunCommand("rm -rf '/home/gwebsite/public_html/" + item.PrjInstalledPlugin.SUBDOMAIN + "/wp-content/plugins/" + pluginDirectoryName + "'");
                             if (item.IsChecked)
                             {
                                 client.RunCommand($"mkdir '{"/home/gwebsite/public_html/" + item.PrjInstalledPlugin.SUBDOMAIN + "/wp-content/plugins/" + pluginDirectoryName}' && cp -a '{item.PrdPlugin.PluginLocation + "/."}' '{"/home/gwebsite/public_html/" + item.PrjInstalledPlugin.SUBDOMAIN + "/wp-content/plugins/" + pluginDirectoryName}'");
