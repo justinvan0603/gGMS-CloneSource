@@ -52,7 +52,7 @@ namespace testCloneOnLinux.Controllers
 
                         client.Disconnect();
                         Data.ObjectResult result = new Data.ObjectResult();
-                        result.isSucceeded = false;
+                        result.isSucceeded = true;
                         result.ErrorMessage = "Cập nhật và cài đặt plugin thành công!";
                         return result;
                     }

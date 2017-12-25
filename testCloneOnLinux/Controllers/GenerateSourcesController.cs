@@ -39,7 +39,7 @@ namespace testCloneOnLinux.Controllers
                         client.RunCommand($"mkdir '{toDestination}' && cd '{fromLocation}' && cp * '{toDestination}'");
                         /*------------*/
                         //Tao Mysql User va DB, gan user quan ly DB vua tao
-                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
+                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 3306, "127.0.0.1", 3306);
                         client.AddForwardedPort(portForwarded);
                         portForwarded.Start();
                         DatabaseConnect mySqlConnector = new DatabaseConnect("Server=127.0.0.1; Port=3306; Uid=root; Pwd=JOpaqGH7N7xz;");
@@ -228,7 +228,7 @@ namespace testCloneOnLinux.Controllers
                         client.RunCommand(chownAllContent);
                         /*------------*/
                         //Khoi tao ket noi vao MySqL
-                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
+                        var portForwarded = new ForwardedPortLocal("127.0.0.1", 3306, "127.0.0.1", 3306);
                         client.AddForwardedPort(portForwarded);
                         portForwarded.Start();
 
