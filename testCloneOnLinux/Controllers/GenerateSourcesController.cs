@@ -228,7 +228,7 @@ namespace testCloneOnLinux.Controllers
                         client.RunCommand(chownAllContent);
                         /*------------*/
                         //Khoi tao ket noi vao MySqL
-                        //(Khi deploy that tren Server thi PortFoward phai la "0" khi deployu Local thi la "3306")
+                        //(Khi deploy that tren Server thi PortFoward phai la "0" khi deploy Local thi la "3306")
                         var portForwarded = new ForwardedPortLocal("127.0.0.1", 0, "127.0.0.1", 3306);
                         client.AddForwardedPort(portForwarded);
                         portForwarded.Start();
