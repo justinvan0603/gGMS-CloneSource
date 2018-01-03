@@ -13,6 +13,7 @@ using Renci.SshNet;
 using MySql.Data.MySqlClient;
 using MySql;
 using System.Text;
+using Renci.SshNet.Common;
 
 namespace testCloneOnLinux.Controllers
 {
@@ -209,10 +210,36 @@ namespace testCloneOnLinux.Controllers
 
                     if (client.IsConnected)
                     {
-                        ////Copy source tu folder goc fromLocation sang folder moi toDestination
+                        using (SftpClient sftpClient = new SftpClient("103.7.41.51", 22, "root", "Gsoft@235"))
+                        {
+                            sftpClient.ConnectionInfo.Timeout = TimeSpan.FromSeconds(1200);
+                            sftpClient.OperationTimeout = TimeSpan.FromSeconds(1200);
+                            sftpClient.Connect();
+                            if (sftpClient.IsConnected)
+                            {
+                                bool isExist = false;
+                                try
+                                {
+                                    sftpClient.ChangeDirectory("/home/gwebsite/public_html/" + modelGen.Subdomain);
+                                    isExist = true;
+                                }
+                                catch (SftpPathNotFoundException)
+                                {
+                                    isExist = false;
+                                }
+                                if(isExist)
+                                {
+                                    Data.ObjectResult checkResult = new Data.ObjectResult();
+                                    checkResult.isSucceeded = false;
+                                    checkResult.ErrorMessage = "Website này đã được khởi tạo!";
+                                    return checkResult;
+                                }
+                            }
+                        }
+                                ////Copy source tu folder goc fromLocation sang folder moi toDestination
 
-                       // client.RunCommand($"mkdir '{modelGen.Destination}' && cd '{modelGen.Source}' && cp * '{modelGen.Destination}'");
-                        client.RunCommand($"mkdir '{modelGen.Destination}' && cp -a '{modelGen.Source + "/."}' '{modelGen.Destination}'");
+                                // client.RunCommand($"mkdir '{modelGen.Destination}' && cd '{modelGen.Source}' && cp * '{modelGen.Destination}'");
+                                client.RunCommand($"mkdir '{modelGen.Destination}' && cp -a '{modelGen.Source + "/."}' '{modelGen.Destination}'");
                         // client.RunCommand($"cd /home/gwebsite/public_html");
                         //Fix permission cua tat ca folder ve 0755 va cac file ve 0644
                         string chmodCommand = "find "+ "'/home/gwebsite/public_html/"+modelGen.Subdomain+ @"' -type d -exec chmod 0755 {} \;";
