@@ -568,7 +568,7 @@ namespace testCloneOnLinux.Controllers
                     }
                     Data.ObjectResult rs = new Data.ObjectResult();
                     rs.isSucceeded = true;
-                    rs.ErrorMessage = "Clone sản phẩm thành công";
+                    rs.ErrorMessage = "Website đã được khởi tạo!";
                     return rs;
                 }
                 catch (Exception ex)
