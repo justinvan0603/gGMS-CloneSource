@@ -227,6 +227,10 @@ namespace testCloneOnLinux.Controllers
                                 {
                                     isExist = false;
                                 }
+                                finally
+                                {
+                                    sftpClient.Disconnect();
+                                }
                                 if(isExist)
                                 {
                                     Data.ObjectResult checkResult = new Data.ObjectResult();
